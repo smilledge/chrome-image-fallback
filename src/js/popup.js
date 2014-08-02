@@ -8,8 +8,11 @@
    * Setup the for / defaults
    */
   var initialize = function() {
-    _getDefaultHost(function(curr) {
-      $('[name="fallbackHost"]').val(curr);
+    _getSettings(function(settings) {
+      $('[name="fallbackHost"]').val(settings.fallback);
+      if (settings.query && settings.query.styleSheets) {
+        $('[name="styleSheets"]').prop('checked', true);
+      }
     });
   };
 
@@ -19,7 +22,8 @@
    */
   $form.on('submit', function(e) {
     e.preventDefault();
-    var fallbackHost = $('[name="fallbackHost"]').val();
+    var fallbackHost = $('[name="fallbackHost"]').val(),
+        queryStyleSheets = $('[name="styleSheets"]').prop('checked');
 
     // Get the active tab's url
     _getActiveTab(function(activeTab) {
@@ -30,6 +34,10 @@
 
         settings[_parseUrl(activeTab.url).hostname] = {
           fallback: fallbackHost,
+          query: {
+            dom: true,
+            styleSheets: queryStyleSheets
+          },
           enabled: true
         };
 
@@ -59,12 +67,12 @@
   /**
    * Get the default host for this host in local storage 
    */
-  var _getDefaultHost = function(callback) {
+  var _getSettings = function(callback) {
     _getActiveTab(function(activeTab) {
       var activeHost = _parseUrl(activeTab.url).hostname;
 
       chrome.storage.local.get(function(settings) {
-        callback(settings[activeHost].fallback);
+        callback(settings[activeHost]);
       });
     });
   };

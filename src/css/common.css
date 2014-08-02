@@ -71,4 +71,6 @@ button.danger:hover {
   background: #910c28;
 }
 
-.form-group {}
+.form-group {
+  margin-bottom: 10px;
+}

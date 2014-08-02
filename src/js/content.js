@@ -10,15 +10,23 @@
    * Request any fallback images from the background script
    */
   var initialize = function() {
-    chrome.runtime.sendMessage({
-      action: 'getImageFallbacks'
-    }, function(response) {
-      if (response && response.length) {
-        response.forEach(function(replace) {
-          replaceMarkupImages(replace);
-          replaceStyleSheetImages(replace);
-        });
-      }
+    chrome.storage.local.get(function(settings) {
+      settings = settings[document.location.hostname];
+
+      chrome.runtime.sendMessage({
+        action: 'getImageFallbacks'
+      }, function(response) {
+        if (response && response.length) {
+          response.forEach(function(replace) {
+            replaceMarkupImages(replace);
+
+            if (settings.query && settings.query.styleSheets) {
+              replaceStyleSheetImages(replace);
+            }
+          });
+        }
+      });
+
     });
   };
 
