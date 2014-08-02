@@ -9,6 +9,3 @@ You can download this extension from the Chrome Web Store [here](https://chrome.
 
 ### Build
     grunt
-
-### Limitations
- - Image urls within external stylesheets will not be replaced
