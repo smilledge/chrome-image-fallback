@@ -59,8 +59,32 @@
     // Add the CSS rules to the new stylesheet
     var sheet = styleNode.sheet;
     extractedRules.forEach(function(rule) {
-      sheet.insertRule(rule.selectorText + '{background-image:url(' + replace.fallback + ');}', sheet.cssRules.length);
+      sheet.insertRule(_buildCssRule(rule, replace.fallback), sheet.cssRules.length);
     });
+  };
+
+
+  /**
+   * Build a CSS rule string from a CSSStyleRule
+   *
+   * @param {CSSStyleRule}
+   * @return {string}
+   */
+  var _buildCssRule = function(rule, url) {
+    var output = "",
+        hasMedia = rule.parentRule && rule.parentRule.media;
+
+    if (hasMedia) {
+      output += '@media ' + rule.parentRule.media.mediaText + ' {';
+    }
+
+    output += rule.selectorText + '{ background-image: url(' + url + '); }';
+
+    if (hasMedia) {
+      output += '}';
+    }
+
+    return output;
   };
 
 

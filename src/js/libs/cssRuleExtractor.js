@@ -119,7 +119,17 @@
     var rules = [];
 
     for (var i = 0, len = styleSheets.length; i < len; i++) {
-      rules = rules.concat(Array.prototype.slice.call(styleSheets[i].cssRules));
+      var cssRules = styleSheets[i].cssRules,
+          mediaRules = [];
+
+      // CSSMediaRule has a child cssRules that needs to be added the the rules array
+      for (var j = 0, mLen = cssRules.length; j < mLen; j++) {
+        if (cssRules[j].constructor.name === 'CSSMediaRule') {
+          mediaRules = mediaRules.concat(Array.prototype.slice.call(cssRules[j].cssRules));
+        }
+      }
+
+      rules = rules.concat(Array.prototype.slice.call(cssRules), mediaRules);
     };
 
     return rules;
