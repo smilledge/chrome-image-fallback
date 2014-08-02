@@ -1,7 +1,7 @@
 {
-  "name": "image-fallback",
-  "version": "1.0.0",
-  "description": "Image Fallback is a Google Chrome extension that allows you to specify a fallback host to retrieve images from if they cannot be found on the original host. This helps developers keep their image assets in sync between their local, staging and production environments.",
+  "name": "Image Fallback",
+  "version": "1.0.1",
+  "description": "Specify a fallback host to retrieve images from if they cannot be found on the original host.",
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.4",
