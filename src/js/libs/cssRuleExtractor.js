@@ -8,7 +8,7 @@
    * 
    * @class  CssRuleExtractor
    */
-  CssRuleExtractor = function(styleSheets, defaultProperty) {
+  var CssRuleExtractor = function(styleSheets, defaultProperty) {
     this.styleSheets = _filterActiveStyleSheets(styleSheets);
     this.rules = _aggregateStyleSheetRules(this.styleSheets);
 
@@ -59,7 +59,7 @@
       if (exact) {
         return rule.style[this._property] === propValue;
       } else {
-        return rule.style[this._property].indexOf(propValue) !== -1
+        return rule.style[this._property].indexOf(propValue) !== -1;
       }
     }.bind(this));
 
@@ -130,7 +130,7 @@
       }
 
       rules = rules.concat(Array.prototype.slice.call(cssRules), mediaRules);
-    };
+    }
 
     return rules;
   };

@@ -1,6 +1,8 @@
 ;(function() {
 
-  var $ = require('./libs/jquery'),
+  var $ = require('./vendor/jquery'),
+      Settings = require('./libs/settings'),
+      utils = require('./libs/utils'),
       $form = $('#fallbackForm');
 
 
@@ -22,30 +24,22 @@
    */
   $form.on('submit', function(e) {
     e.preventDefault();
+
     var fallbackHost = $('[name="fallbackHost"]').val(),
         queryStyleSheets = $('[name="styleSheets"]').prop('checked');
 
-    // Get the active tab's url
+    // Get the active tab's url and save it's settings
     _getActiveTab(function(activeTab) {
-
-      // Save it to lacal storage
-      chrome.storage.local.get(function(settings) {
-        settings = settings || {};
-
-        settings[_parseUrl(activeTab.url).hostname] = {
-          fallback: fallbackHost,
-          query: {
-            dom: true,
-            styleSheets: queryStyleSheets
-          },
-          enabled: true
-        };
-
-        chrome.storage.local.set(settings, function() {
-          // Reload the current tab and close the popup
-          chrome.tabs.reload(activeTab.id);
-          window.close();
-        });
+      Settings.set(utils.parseUrl(activeTab.url).hostname, {
+        fallback: fallbackHost,
+        query: {
+          dom: true,
+          styleSheets: queryStyleSheets
+        },
+        enabled: true
+      }, function() {
+        chrome.tabs.reload(activeTab.id);
+        window.close();
       });
     });
   });
@@ -69,23 +63,9 @@
    */
   var _getSettings = function(callback) {
     _getActiveTab(function(activeTab) {
-      var activeHost = _parseUrl(activeTab.url).hostname;
-
-      chrome.storage.local.get(function(settings) {
-        callback(settings[activeHost]);
-      });
+      var activeHost = utils.parseUrl(activeTab.url).hostname;
+      Settings.get(activeHost, callback);
     });
-  };
-
-
-  /**
-   * Parse a URL
-   * https://gist.github.com/jlong/2428561
-   */
-  var _parseUrl = function(url) {
-    var parser = document.createElement('a');
-    parser.href = url;
-    return parser;
   };
 
 

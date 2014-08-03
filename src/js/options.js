@@ -1,12 +1,13 @@
 ;(function() {
 
-  var $ = require('./libs/jquery');
+  var $ = require('./vendor/jquery'),
+      Settings = require('./libs/settings');
 
 
   /**
    * Show all currently configured fallback hosts
    */
-  chrome.storage.local.get(function(settings) {
+  Settings.get(function(settings) {
     var template = [];
     for (var key in settings) {
       template.push('<tr><td>' + key + '</td><td>' + settings[key].fallback + '</td></tr>');
@@ -19,7 +20,7 @@
    * Clear all settings
    */
   $('.btnClearSettings').on('click', function() {
-    chrome.storage.local.clear(function() {
+    Settings.clear(function() {
       window.location.href = window.location;
     });
   });

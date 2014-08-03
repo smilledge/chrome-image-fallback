@@ -1,5 +1,8 @@
 ;(function() {
 
+  var Settings = require('./libs/settings'),
+      utils = require('./libs/utils');
+
 
   /**
    * Stores messages for each tab keyed by tabId
@@ -20,14 +23,12 @@
       return;
     }
 
-    var currentUrl = _parseUrl(e.url);
+    var currentUrl = utils.parseUrl(e.url);
 
     // Get the configured host fallbacks
-    chrome.storage.local.get(function(settings) {
-
-      if (settings[currentUrl.host]) {
-
-        var fallbackHost = settings[currentUrl.host].fallback,
+    Settings.get(currentUrl.host, function(settings) {
+      if (settings) {
+        var fallbackHost = settings.fallback,
             fallbackProtocol = currentUrl.protocol + '//',
             targetImage = currentUrl.pathname + currentUrl.search,
             fallbackUrl = fallbackProtocol + fallbackHost + targetImage;
@@ -36,15 +37,21 @@
           tabMessages[e.tabId] = [];
         }
 
-        // Add fallback to the message queue for this tab
-        // We can't send directly to the content script as it probably isn't loaded yet.
-        // Instead the content script must request image replacements once it is loaded
-        tabMessages[e.tabId].push({
+        var message = {
           target: targetImage,
           fallback: fallbackUrl
+        };
+
+        // Send a message to the content script for this tab
+        chrome.tabs.sendMessage(e.tabId, message, function(response) {
+          if (typeof response === 'undefined') {
+            // The content script probably hasn't loaded yet
+            // Add fallback to the message queue for this tab
+            // Instead the content script must request image replacements once it is loaded
+            tabMessages[e.tabId].push(message);
+          }
         });
       }
-
     });
   }, {
     urls: ['<all_urls>'],
@@ -65,15 +72,5 @@
 
   });
 
-
-  /**
-   * Parse a URL
-   * https://gist.github.com/jlong/2428561
-   */
-  var _parseUrl = function(url) {
-    var parser = document.createElement('a');
-    parser.href = url;
-    return parser;
-  };
 
 })();

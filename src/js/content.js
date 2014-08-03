@@ -1,6 +1,7 @@
 ;(function() {
 
-  var $ = require('./libs/jquery'),
+  var $ = require('./vendor/jquery'),
+      Settings = require('./libs/settings'),
       CssRuleExtractor = require('./libs/cssRuleExtractor'),
       backgoundImageExtractor = new CssRuleExtractor(document.styleSheets, 'backgroundImage');
 
@@ -10,21 +11,34 @@
    * Request any fallback images from the background script
    */
   var initialize = function() {
-    chrome.storage.local.get(function(settings) {
-      settings = settings[document.location.hostname];
+    Settings.get(document.location.hostname, function(settings) {
 
+      // Get any replacements which were sent before this script was loaded
       chrome.runtime.sendMessage({
         action: 'getImageFallbacks'
       }, function(response) {
-        if (response && response.length) {
-          response.forEach(function(replace) {
-            replaceMarkupImages(replace);
-
-            if (settings.query && settings.query.styleSheets) {
-              replaceStyleSheetImages(replace);
-            }
-          });
+        if (!response || !response.length) {
+          return;
         }
+
+        response.forEach(function(replace) {
+          replaceMarkupImages(replace);
+          if (settings.query && settings.query.styleSheets) {
+            replaceStyleSheetImages(replace);
+          }
+        });
+      });
+
+      // Listen for new replacements (images that were dynamically loaded)
+      chrome.runtime.onMessage.addListener(function(replace, sender, sendResponse) {
+        replaceMarkupImages(replace);
+        if (settings.query && settings.query.styleSheets) {
+          replaceStyleSheetImages(replace);
+        }
+
+        sendResponse({
+          success: true
+        });
       });
 
     });

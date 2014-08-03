@@ -28,7 +28,7 @@ module.exports = function(grunt) {
     jshint: {
       options: grunt.file.readJSON('lint-options.json'), // see http://www.jshint.com/docs/options/
       all: { src: ['package.json', 'lint-options.json', 'Gruntfile.js', 'src/**/*.js',
-                   'src/**/*.json', '!src/js/libs/*'] }
+                   'src/**/*.json', '!src/js/vendor/*'] }
     },
 
     copy: {
